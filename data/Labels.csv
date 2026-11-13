@@ -1,0 +1,32 @@
+EMDB_entry,Polymorph,Sequence_Variant,Origin,PH
+10670,Polymorph 2,S20G,Synthetic,6.0
+10671,Polymorph 3,S20G,Synthetic,6.0
+11380,Polymorph 2PF,WT,Synthetic,6.0
+11382,Polymorph 2PF,S20G,Synthetic,6.8
+11383,Polymorph 3PF,S20G,Synthetic,6.8
+15696,Polymorph 2PF-P,S20G,Synthetic,6.8
+15728,Polymorph 2PF-L,S20G,Synthetic,6.8
+15729,Polymorph 2PF-C,S20G,Synthetic,6.8
+15730,Polymorph 3PF-CU,S20G,Synthetic,6.8
+15731,Polymorph 4PF-CU,S20G,Synthetic,6.8
+15753,Polymorph 2PF-L,S20G,Synthetic,6.8
+15754,Polymorph 4PF-CU,S20G,Synthetic,6.8
+15755,Polymorph 4PF-LU,S20G,Synthetic,6.8
+15756,Polymorph 4PF-LJ,S20G,Synthetic,6.8
+18441,Polymorph 1,S29P,Homo sapiens,7.4
+18671,Polymorph 1,S29P,Homo sapiens,7.4
+18672,Polymorph 2,S29P,Homo sapiens,7.4
+18673,Polymorph 3,S29P,Homo sapiens,7.4
+18827,Polymorph 2,A25P,Homo sapiens,7.4
+19353,Polymorph 1,S28P,Homo sapiens,7.4
+19354,Polymorph 2,S28P,Homo sapiens,7.4
+33897,SF,WT,Synthetic,7.0
+33902,TF,WT,Synthetic,7.0
+33903,TF,WT,Synthetic,7.0
+51726,SS,WT,Synthetic,7.4
+51730,LL,WT,Synthetic,7.4
+51733,LLU,WT,Synthetic,7.4
+51734,LLUU,WT,Synthetic,7.4
+51735,LL,WT,Synthetic,7.4
+51736,LLU,WT,Synthetic,7.4
+51737,LLUU,WT,Synthetic,7.4
