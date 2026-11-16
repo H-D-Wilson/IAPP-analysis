@@ -8,9 +8,9 @@ This is my Python code used in my thesis titled  "Computational quantitative ana
 | Helical info (rise, twist, symmetry, cross-sectional area, height, roundness) | PCA; hierarchical clustering |
 | 3D density maps | Sinkhorn (optimal-transport) distance, hierarchical clustering; UMAP |
 
-The agreement between all six clusterings is measured with the Adjusted Rand Index (`ari.py`)script, and the final dendrogram figures with structure images were made with the 'collage_combiner_x.py' scripts.
+The agreement between all six clusters is measured with the Adjusted Rand Index (`ari.py`) script, and the final dendrogram figures with structure images were made with the collage_combiner_x.py scripts.
 
-The inputs (figures, density maps and helical tables) were generated with **Trace_y**, a MATLAB program for amyloid filament tracing. The MATLAB step is not part of this repository; the Trace_y outputs needed to run everything here are in `data/` (see [`data/README.md`](data/README.md)). So reproducing the data produced should not be difficult. As said if you wish to feed your own data produced from trace_y into this pipline the 'data/README.md' provides extra details.
+The inputs (figures, density maps and helical tables) were generated with **Trace_y**, a MATLAB program for amyloid filament tracing. The MATLAB step is not part of this repository; the Trace_y outputs needed to run everything here are in `data/` (see [`data/README.md`](data/README.md)). So reproducing the data produced should not be difficult. As said, if you wish to feed your own data produced from Trace_y into this pipeline, the 'data/README.md' provides extra details.
 
 ## Repository layout
 
@@ -18,7 +18,7 @@ The inputs (figures, density maps and helical tables) were generated with **Trac
 .
 ├── data/                        input data (see data/README.md)
 │   ├── multipanel_figures/      Trace_y multi-panel PNGs
-│   ├── RAW density/             3D density maps, <EMDB id>.mat
+│   ├── Raw density/density_64            3D density maps, <EMDB id>.mat
 │   ├── Labels.csv               polymorph / variant / origin / pH per structure
 │   ├── Masterhelicalinfo.csv    helical info table
 │   └── Pitchtable.csv           helical pitch per structure
@@ -40,6 +40,8 @@ The Python version I recommend for using this pipeline is 3.11 or above (the scr
 
 Worth mentioning that because of the **repository root**, all of the functions can be run relative to the repository, so the scripts can work wherever they are placed; as a result, reproducibility should be smooth. Also important to note that every script has its own little  `--help` option listing its inputs and outputs, and each input/output folder can be overridden on the command line.
 
+In addition, a folder containing the raw density maps can be found at https://doi.org/10.5281/zenodo.24114920; it was not included in the repository as it is too large (1.2GB), though the resampled density maps that they are converted into for analysis are included and provide the same results.
+
 ## Pipeline
 
 ```
@@ -50,22 +52,23 @@ data/multipanel_figures ─► crop panels ─► (manual crops where Auto crop 
 data/Labels.csv ───────────────────┼─► HOG ─────────┐
                                    ├─► image PCA ───┤
 data/Masterhelicalinfo.csv ────────┼─► info PCA ────┼─► ARI comparison
-                                   ├─► info cluster ┤
-data/raw density ──────────────────┼─► Sinkhorn ─┬──┤
-                                   │                └─► UMAP
-                                   └─► collage combiner scripts ─► combined dendrogram figures
+                                   ├─► info cluster ┤       |    |
+ RAW density/(not in repo)   ──────┼────────────────┼─► Sinkhorn |  
+  (check Zenodo)↗            │     │                        └─► UMAP 
+ density_64/                 │     └─► collage combiner scripts ─► combined dendrogram figures                                           
+ (resampled density maps) ───️          
 ```
 
 ### 1. Image preparation
 
-| Step | Script | What it does |
-|---|---|---|
+| Step | Script | What it does                                                                                                                                                                                                                                                                                                                                                                                            |
+|---|---|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 01 | `auto_crop_panels.py` | This script detects and crops the top-left (cross-section) panel of each Trace_y figure by default but can be adjusted to also auto-crop the top right, bottom right and bottom left panels if desired; it also labels the cropped panels with their respective EMDB ID, and makes a preliminary collage to check the results across all of the cropped images and prints the panels it could not crop. |
-| 02 | `manual_crop.py` | This script manually crops one panel of one figure (`--panel left/middle/right` or `--ratio`). Use for failures from step 01. The resulting crop is put in output/manual_cropped_batch/<panel>/, so the automatic crops are never overwritten. You can add --replace-auto to deliberately replace a failed cross-section crop in output/cropped_panels/. |
-| 03 | `manual_crop_batch.py` | This script is the same as the manual crop script but is applied to every figure. Output goes to `output/manual_cropped_batch/<panel>/`. |
-| 04a | `scalebar_adder_longitudinal.py` | This script adds scale bars to crops of the simulated-AFM (one-pitch longitudinal) panel; specifically, it calculates the length of these bars using each structure's pitch from `Pitchtable.csv`. |
-| 04b | `scalebar_adder_cross_section.py` | This script adds scale bars to the cross-section crops (Cryo-EM images and contact point images). |
-| 05 | `collage_maker.py` | This script takes the images from an image folder and combines them into a figure-ready collage. |
+| 02 | `manual_crop.py` | This script manually crops one panel of one figure (`--panel left/middle/right` or `--ratio`). Use for failures from step 01. The resulting crop is put in `output/manual_cropped_batch/<panel>`, so the automatic crops are never overwritten. You can add --replace-auto to deliberately replace a failed cross-section crop in output/cropped_panels/.                                               |
+| 03 | `manual_crop_batch.py` | This script is the same as the manual crop script but is applied to every figure. Output goes to `output/manual_cropped_batch/<panel>/`.                                                                                                                                                                                                                                                                |
+| 04a | `scalebar_adder_longitudinal.py` | This script adds scale bars to crops of the simulated-AFM (one-pitch longitudinal) panel; specifically, it calculates the length of these bars using each structure's pitch from `Pitchtable.csv`.                                                                                                                                                                                                      |
+| 04b | `scalebar_adder_cross_section.py` | This script adds scale bars to the cross-section crops (Cryo-EM images and contact point images).                                                                                                                                                                                                                                                                                                       |
+| 05 | `collage_maker.py` | This script takes the images from an image folder and combines them into a figure-ready collage.                                                                                                                                                                                                                                                                                                        |
 
 ```bash
 python scripts/auto_crop_panels.py
@@ -77,18 +80,18 @@ python scripts/scalebar_adder_cross_section.py
 python scripts/collage_maker.py
 ```
 
-Steps 06 and 07 read `output/cropped_panels/` from step 01 (and 02 if used). The 13 figures read it too, and also need the `right`, `middle` and `left` batches for those scripts to work.
+Steps 06 and 07 read `output/cropped_panels/` from step 01 (and 02 if used). The 13 figures read it too; with them needing the top row of panels, these are the Cryo-EM (top-left), contact points (top-middle), and AFM simulation (top-right) panels from their respective output folders (`output/cropped_panels/`, `output/manual_cropped_batch/middle/` and  `output/manual_cropped_batch/right/`) for those scripts to work.
 
 ### 2. Clustering
 
-| Step | Script | Input | Main outputs (in `output/…`) |
-|---|---|---|---|
-| 06 | `hog.py` | cross-section crops, `Labels.csv` | `hog/`: dendrogram, similarity network, `hog_final_layout.csv`, `hog_cluster_labels.csv`, `hog_linkage_matrix.npy` |
-| 07 | `image_pca.py` | cross-section crops, `Labels.csv` | `pca/`: `pca_scatter.png`, `pca_cluster_labels.csv` |
-| 08 | `helical_info_pca.py` | `Masterhelicalinfo.csv`, `Labels.csv` | `helical_pca/`: `pca_scatter.png`, `pca_cluster_labels.csv`, `helical_pca_loadings.csv` |
-| 09 | `helical_info_clustering.py` | `Masterhelicalinfo.csv`, `Labels.csv` | `helical_clustering/`: dendrograms, `helical_cluster_labels.csv`, linkage matrix (`.csv`, `.npy`), leaf order |
-| 10 | `emd_density_clustering.py` | `data/RAW density/*.mat or density_64`, `Labels.csv` | `emd_clustering/`: `EMD_3D_cluster.png`, `emd_cluster_labels.csv`, `sinkhorn_distance_matrix.npy` |
-| 11 | `emd_umap.py` | output of step 10 | `emd_umap/`: `umap_scatter.png`, `umap_cluster_labels.csv` |
+| Step | Script | Input                                                      | Main outputs (in `output/…`) |
+|---|---|------------------------------------------------------------|---|
+| 06 | `hog.py` | cross-section crops, `Labels.csv`                          | `hog/`: dendrogram, similarity network, `hog_final_layout.csv`, `hog_cluster_labels.csv`, `hog_linkage_matrix.npy` |
+| 07 | `image_pca.py` | cross-section crops, `Labels.csv`                          | `pca/`: `pca_scatter.png`, `pca_cluster_labels.csv` |
+| 08 | `helical_info_pca.py` | `Masterhelicalinfo.csv`, `Labels.csv`                      | `helical_pca/`: `pca_scatter.png`, `pca_cluster_labels.csv`, `helical_pca_loadings.csv` |
+| 09 | `helical_info_clustering.py` | `Masterhelicalinfo.csv`, `Labels.csv`                      | `helical_clustering/`: dendrograms, `helical_cluster_labels.csv`, linkage matrix (`.csv`, `.npy`), leaf order |
+| 10 | `emd_density_clustering.py` | `data/RAW density/*.mat or density_64/*.npy`, `Labels.csv` | `emd_clustering/`: `EMD_3D_cluster.png`, `emd_cluster_labels.csv`, `sinkhorn_distance_matrix.npy` |
+| 11 | `emd_umap.py` | output of step 10                                          | `emd_umap/`: `umap_scatter.png`, `umap_cluster_labels.csv` |
 
 ```bash
 python scripts/hog.py
@@ -124,12 +127,14 @@ The 13 scripts print `Leaf order matches …`; when the dendrograms are drawn, t
 - **Scale bars, longitudinal panel (04a):** The scale used by the scale bars is derived from each structure's own pitch (`ceil(1 px/nm × pitch)` data pixels across the panel). The scale is only accurate if the cropped image stretches across exactly that panel width;  so it's important to check a few results against known pitches to see if it is truly representative.
 - **Scale bars, cross-section panel (04b):** The script assumes a panel's width is 20 nm (±10 nm; this is Trace_y's default for this parameter). Because of this, it underestimates the scale for structures a little where the max cross-sectional radius is above 10 nm.
 - **Scale bars only suit their own panel:** For instance, 04a on cross-section crops or 04b on longitudinal crops creates a scale bar that is incorrect since both calculate the scales of these bars differently that is suited for the dimensions of the script's specific image input.
-- **Filenames carry the EMDB ID:** The filename of each input corresponds to the EMDB ID of that specific structure that the files represent; for instance, the multi-panel figures like `emd_18827.png` and density maps like `18827.mat highlight this; specific scripts require these files to obey this nomenclature, so they must be left named as is`.
-- **HOG and image PCA also use the "EMD-xxxxx" label** that step 01 uses on each crop, since they read the crops directly, which also have the same naming convention.
+- **Filenames carry the EMDB ID:** The filename of each input corresponds to the EMDB ID of that specific structure that the files represent; for instance, the multi-panel figures like `emd_18827.png` and density maps like `18827.mat` highlight this; specific scripts require these files to obey this nomenclature, so they must be left named as is.
+- **HOG and image PCA also use the EMD-xxxxx label** that step 01 uses on each crop, since they read the crops directly, which also have the same naming convention.
 
 ## Licence and citation
 
-Code license: MIT. (see more in LICENSE)
-Data license: CC0 (see more in data/SOURCES.md)
+Code license: MIT. (see more in [LICENSE](LICENSE))
+
+Data license: CC0 (see more in [data/SOURCES.md](data/SOURCES.md))
+
 If you use this work in yours, please cite the repository (Wilson, 2026) and also Trace_y (Xue, 2025)
 and the EMDB (wwPDB Consortium, 2024) for good measure; see data/SOURCES.md for the full series of references.
